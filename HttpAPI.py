@@ -39,3 +39,6 @@ class HttpTest:
 
     def httpassert(self, message):
         assert self.text != message, self.text
+
+    def gettext(self):
+        return self.text
