@@ -4,6 +4,7 @@
 # @Author  : Rui.Hu
 # @File    : HttpAPI.py
 from .comm.comms import httprequest
+from .comm.comms import getTimeStamp
 
 class HttpTest:
     def __init__(self):
@@ -42,3 +43,4 @@ class HttpTest:
 
     def gettext(self):
         return self.text
+

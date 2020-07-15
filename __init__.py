@@ -1,4 +1,6 @@
 from .HttpAPI import *
+from .comm.comms import getTimeStamp
+from .comm.comms import setimageData
 __version__ = "1.0"
 
 class CwtestLibrary(HttpTest):
@@ -31,5 +33,9 @@ class CwtestLibrary(HttpTest):
     def posts_requst(self):
         return self.test.postrequst()
 
-    def getimage(self, ):
-        pass
+    def gets_base64image(self, ):
+        return setimageData()[1]
+
+    def sets_timestamp(self):
+        return getTimeStamp()
+

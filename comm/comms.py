@@ -12,7 +12,6 @@ import pymysql
 import requests
 import json
 import time
-import datetime
 import random
 
 def cv2ImgAddText(img, text, left, top, textColor=(0, 255, 0), textSize=80):
@@ -35,8 +34,8 @@ def setimageData(imagepath):
     img = Image.open(imagepath)
     return img.size, s.split(",")[0]
 
-def getTimeStamp(n):
-    return int(time.time() * 1000 - 1728000000) + n * 3600000
+def getTimeStamp():
+    return int(time.time() * 1000)
 
 def getRandom():
     x1 = random.randint(0, 9)
