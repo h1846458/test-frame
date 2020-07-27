@@ -1,6 +1,8 @@
 from .HttpAPI import *
 from .comm.comms import getTimeStamp
 from .comm.comms import setimageData
+from .comm.comms import getVerificationcode
+from .comm.comms import getCaptchaKey
 __version__ = "1.0"
 
 class CwtestLibrary(HttpTest):
@@ -21,6 +23,9 @@ class CwtestLibrary(HttpTest):
     def sets_ip(self, ip):
         return self.test.setip(ip)
 
+    def sets_url(self, url):
+        return  self.test.setip(url)
+
     def sets_port(self, port):
         return self.test.setport(port)
 
@@ -39,3 +44,8 @@ class CwtestLibrary(HttpTest):
     def sets_timestamp(self):
         return getTimeStamp()
 
+    def gets_Verificationcode(self, ip, url):
+        return getVerificationcode(ip, url)
+
+    def gets_CaptchaKey(self):
+        return getCaptchaKey()

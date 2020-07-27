@@ -12,7 +12,10 @@ import pymysql
 import requests
 import json
 import time
+import redis
 import random
+
+CaptchaKey = ""
 
 def cv2ImgAddText(img, text, left, top, textColor=(0, 255, 0), textSize=80):
     if (isinstance(img, np.ndarray)):  # 判断是否OpenCV图片类型
@@ -76,6 +79,8 @@ class httprequest:
 
     def setUrl(self, url):
         self.url = url
+
+
     def getRequst(self):
         httpurl = self.getUrl(self.url)
         req = requests.get(httpurl, headers=self.header)
@@ -88,7 +93,7 @@ class httprequest:
         req = requests.post(url=httpurl, headers=self.header, data=data)
         text = req.text
         text = json.loads(text)
-        self.setHeader("Authorization", text['data']['accessToken'])
+        return text['data']['accessToken']
 
     def postRequest(self, data):
         httpurl = self.getUrl(self.url)
@@ -96,6 +101,7 @@ class httprequest:
         text = req.text
         text = json.loads(text)
         return text
+
 
 
 class mySqldb:
@@ -118,3 +124,45 @@ class mySqldb:
 
     def closeConect(self):
         self.sql.close()
+
+class redisdb:
+    def __init__(self, ip, port, db, password, url):
+        self.ip = ip
+        self.port = port
+        self.db = db
+        self.passwd = password
+        self.pool = ''
+        self.url = url
+        self.captchaKey = ""
+
+    def connectRedis(self):
+        self.pool = redis.ConnectionPool(host=self.ip, port=self.port, db=self.db, password=self.passwd)
+
+    def getValue(self):
+        req = requests.get("http://" + self.ip + self.url)    #"/cwos-portal/portal/account/captcha")
+        text = req.json()
+        #pool = redis.ConnectionPool(host=self.ip, port=self.port, db=10, password="1qaz!QAZ")
+        CaptchaKey = text['data']['captchaKey']
+        key = "VerifyCaptcha:" + text['data']['captchaKey']
+        r = redis.StrictRedis(connection_pool=self.pool)
+        #value = r.keys()
+        value = str(r.get(key), encoding='utf-8')
+        r.close()
+        return value
+
+    def closeRedis(self):
+        pass
+
+def getVerificationcode(ip, url):
+    pt = 6379
+    db = 10
+    passwds = "1qaz!QAZ"
+    red = redisdb(ip, pt, db, passwds, url)
+    red.connectRedis()
+    value = red.getValue()
+    #CaptchaKey = red.captchaKey
+    return value
+
+
+def getCaptchaKey():
+    return CaptchaKey
