@@ -4,6 +4,7 @@
 # @Author  : Rui.Hu
 # @File    : HttpAPI.py
 from .comm.comms import httprequest
+import json
 from .comm.comms import getTimeStamp
 
 class HttpTest:
@@ -11,36 +12,50 @@ class HttpTest:
         self.httprequst = ""
         self.text = ""
 
-    def openrequst(self):
+    def open_requst(self):
         self.httprequst = httprequest()
 
-    def setip(self, ip):
+    def set_ip(self, ip):
         self.httprequst.setIp(ip)
 
-    def setheader(self, k, v):
+    def set_header(self, k, v):
         self.httprequst.setHeader(k, v)
 
-    def setport(self, port):
+    def set_port(self, port):
         self.httprequst.setPort(port)
 
-    def seturl(self, url):
+    def set_url(self, url):
         self.httprequst.setUrl(url)
 
-    def getrequst(self):
+    def get_token(self, url, data):
+        return self.httprequst.getToken(url, data)
+
+    def get_requst(self, url):
         if self.httprequst.ip != "":
-            self.text = self.httprequst.getRequst()
+            self.text = self.httprequst.getRequst(url)
         else:
             print("请先初始化Ip， port， url")
 
-    def postrequst(self):
+    def post_requst(self, url, data):
         if self.httprequst.ip != "":
-            self.text = self.httprequst.postRequst()
+            self.text = self.httprequst.postRequest(url, data)
         else:
             print("请先初始化Ip， port， url")
 
-    def httpassert(self, message):
-        assert self.text != message, self.text
+    def http_assert(self, key, message):
+        if(self.__isjson()):
+            json_object = json.loads(self.text)
+            assert json_object[key] == message, "返回码："+json_object[key] + ",对比检验信息：" + message
+        else:
+            print("请求返回信息不是json格式数据")
 
-    def gettext(self):
+    def __isjson(self):
+        try:
+            json_object = json.loads(self.text)
+            return True
+        except ValueError as e:
+            return False
+
+    def get_text(self):
         return self.text
 

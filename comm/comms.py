@@ -76,30 +76,34 @@ class httprequest:
 
     def setHeader(self, key, v):
         self.header[key] = v
+        #print(self.header)
 
     def setUrl(self, url):
         self.url = url
 
 
-    def getRequst(self):
-        httpurl = self.getUrl(self.url)
+    def getRequst(self, url):
+        httpurl = self.getUrl(url)
+        print(self.header)
         req = requests.get(httpurl, headers=self.header)
         text = req.text
         #text = json.loads(text)
         return text
 
-    def getToken(self, data):
-        httpurl = self.getUrl(self.url)
+    def getToken(self, url, data):
+        httpurl = self.getUrl(url)
         req = requests.post(url=httpurl, headers=self.header, data=data)
         text = req.text
+        #print(text)
         text = json.loads(text)
-        return text['data']['accessToken']
+        return [text['data']['accessToken'], text['data']['businessId']]
 
-    def postRequest(self, data):
-        httpurl = self.getUrl(self.url)
+    def postRequest(self, url, data):
+        print(self.url)
+        httpurl = self.getUrl(url)
         req = requests.post(url=httpurl, headers=self.header, data=data)
         text = req.text
-        text = json.loads(text)
+        #text = json.loads(text)
         return text
 
 
@@ -133,7 +137,6 @@ class redisdb:
         self.passwd = password
         self.pool = ''
         self.url = url
-        self.captchaKey = ""
 
     def connectRedis(self):
         self.pool = redis.ConnectionPool(host=self.ip, port=self.port, db=self.db, password=self.passwd)
@@ -148,7 +151,7 @@ class redisdb:
         #value = r.keys()
         value = str(r.get(key), encoding='utf-8')
         r.close()
-        return value
+        return [CaptchaKey, value]
 
     def closeRedis(self):
         pass
@@ -166,3 +169,9 @@ def getVerificationcode(ip, url):
 
 def getCaptchaKey():
     return CaptchaKey
+
+class addstr:
+	def __init__(self,value = ""):
+		self.data = value
+	def __add__(self,other):
+		self.data += other
