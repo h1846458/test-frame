@@ -51,6 +51,7 @@ class HttpTest:
 
     def __isjson(self):
         try:
+            print(self.text)
             json_object = json.loads(self.text)
             return True
         except ValueError as e:

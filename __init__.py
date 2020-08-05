@@ -1,11 +1,11 @@
 from .HttpAPI import *
 from .comm.comms import getTimeStamp
-from .comm.comms import setimageData
-from .comm.comms import getVerificationcode
-from .comm.comms import getCaptchaKey
+from .comm.comms import getimageData
+from .comm.comms import getVerificationcode, getfacedetect
 import ast
 import json
-from .comm.comms import addstr
+import robot.utils.dotdict
+
 __version__ = "1.0"
 
 class CwtestLibrary(HttpTest):
@@ -20,25 +20,24 @@ class CwtestLibrary(HttpTest):
         self.test = ""
 
 
-    def get_base64image(self, ):
-        return setimageData()[1]
+    def get_base64image(self, pth, fl = ''):
+        return getimageData(pth, fl)[1]
 
-    def set_timestamp(self):
+    def get_timestamp(self):
         return getTimeStamp()
 
     def get_Verificationcode(self, ip, url):
         return getVerificationcode(ip, url)
 
-    def get_CaptchaKey(self):
-        return getCaptchaKey()
+    def get_facedetect(self, imagepath):
+        return getfacedetect(imagepath)
 
-    def create_dict(self):
-        return {}
+    def add_json(self, **kwargs):
+        if(type(kwargs) == type({})):
+            return json.dumps(kwargs)
+        else:
+            print("传入的数据格式不对")
 
-    def add_json(self, key, value, d={}):
-        print(key)
-        d[key] = value
-        return json.dumps(d)
 
     def add_string(self, v1, v2, strs=""):
         if (v1 == "Basic"):
@@ -55,9 +54,9 @@ class CwtestLibrary(HttpTest):
         else:
             print("传入的字符串不符合字典格式")
 
-
     def collect_json(self, key, text):
-        try:
+        key = str(key)
+        if(type(text) == str):
             json_object = json.loads(text)
             for k in json_object.keys():
                 if(k == key):
@@ -67,12 +66,52 @@ class CwtestLibrary(HttpTest):
                         for ks in json_object[k].keys():
                             if (ks == key):
                                 return json_object[k][ks]
-
-        except TypeError as e:
-            return False
+        elif(type(text) == dict or type(text) == robot.utils.dotdict.DotDict):
+            for k in text.keys():
+                if (k == key):
+                    return text[k]
+                else:
+                    if (type(text[k]) == type({})):
+                        for ks in text[k].keys():
+                            if (ks == key):
+                                return text[k][ks]
 
     def collect_dict(self, key, text):
         if(type(text) == type({})):
             return text[key]
         else:
             print("传入数据不是字典")
+
+    def replace_str(self, restr, rp, *args):
+        lsstr = restr.split(rp)
+        tmp = ''
+        for s in range(len(args)):
+            tmp += lsstr[s] + rp + str(args[s])
+        return tmp
+
+    def create_lis(self, *value):
+        ls = []
+        for k in value:
+            ls.append(k)
+        return ls
+
+    def insert_lis(self, lis, v):
+        lis.append(v)
+
+    def edit_json(self, dicts, **kwargs):
+        for k in kwargs.keys():
+            dicts[k] = kwargs[k]
+        return dicts
+
+    def get_sizeslist(self, lis):
+        return len(lis)
+
+    def add_dict(self,dicts, k, v):
+        dicts[k] = v
+
+    def update_ver(self, ver, v):
+        ver = v
+
+    def should_equal(self, v1, v2):
+        assert str(v1) == str(v2), v1 + "和" + "值不相等"
+
